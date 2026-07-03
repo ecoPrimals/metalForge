@@ -17,7 +17,8 @@ ip = "192.168.4.250"
 ssh_user = "root"
 site = "house2"
 mac_bridge = "94:83:C4:E0:62:B0"
-note = "Bridge mode. DHCP from sporeGate via SG605S → Omada. MediaTek driver reads .dat files for radio config."
+services = ["wifi", "kinderlab-dns"]
+note = "Bridge mode (main WiFi). DHCP from Flint H1 via SG605S → Omada. KinderLab guest zone (192.168.10.0/24) with local filtered dnsmasq + NAT."
 
 [devices.flint2_house2.radios.band_2g]
 dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b0.dat"
@@ -30,6 +31,28 @@ dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b1.dat"
 ssid = "ApertureScience"
 auth_mode = "WPA2PSK"
 encryp_type = "AES"
+
+[devices.flint2_house2.radios.kinderlab_2g]
+interface = "ra1"
+ssid = "KinderLab"
+auth_mode = "WPA2PSK"
+encryp_type = "AES"
+channel = 7
+role = "kinderlab"
+network = "guest"
+subnet = "192.168.10.0/24"
+note = "House 2 parenting layer. Local filtered dnsmasq (167k rules). NAT via br-lan."
+
+[devices.flint2_house2.radios.kinderlab_5g]
+interface = "rax1"
+ssid = "KinderLab"
+auth_mode = "WPA2PSK"
+encryp_type = "AES"
+channel = 40
+role = "kinderlab"
+network = "guest"
+subnet = "192.168.10.0/24"
+note = "5GHz KinderLab House 2."
 
 [devices.flint2_house1]
 type = "router"
@@ -44,8 +67,8 @@ serial = "7b9ae0d561478fa2"
 role = "edge_router"
 wan_ip = "162.226.225.148"
 wan_mode = "att_ip_passthrough"
-services = ["nat", "dhcp", "dns", "firewall", "wifi", "sovereign-dns-blocklist"]
-note = "Edge router (promoted Jun 27, Wave 127). ATT IP Passthrough to WAN MAC. NAT/DHCP/DNS/firewall. Sovereign DNS blocklist (91k rules). Port forwards to sporeGate for WG/SSH/HTTP/HTTPS/RustDesk/TURN/NestGate. LAN: 192.168.4.1/22. WAN: eth1 → ATT BGW320."
+services = ["nat", "dhcp", "dns", "firewall", "wifi", "sovereign-dns-blocklist", "kinderlab-dns"]
+note = "Edge router (promoted Jun 27, Wave 127). ATT IP Passthrough to WAN MAC. Sovereign DNS (91k + sportsbook). KinderLab guest network (192.168.9.0/24, filtered DNS: 167k rules incl adult + sportsbook). Port forwards to sporeGate. LAN: 192.168.4.1/22. WAN: eth1 → ATT BGW320."
 
 [devices.flint2_house1.radios.band_2g]
 dat_path = "/etc/wireless/mediatek/mt7986-ax6000.dbdc.b0.dat"
@@ -64,6 +87,28 @@ encryp_type = "AES"
 channel = 44
 role = "user"
 note = "User devices, high-speed. HE80 WiFi 6."
+
+[devices.flint2_house1.radios.kinderlab_2g]
+interface = "ra1"
+ssid = "KinderLab"
+auth_mode = "WPA2PSK"
+encryp_type = "AES"
+channel = 1
+role = "kinderlab"
+network = "guest"
+subnet = "192.168.9.0/24"
+note = "Parenting layer. Filtered DNS (167k rules: ads+malware+fakenews+gambling+adult+sportsbook). Guest zone isolated from LAN."
+
+[devices.flint2_house1.radios.kinderlab_5g]
+interface = "rax1"
+ssid = "KinderLab"
+auth_mode = "WPA2PSK"
+encryp_type = "AES"
+channel = 44
+role = "kinderlab"
+network = "guest"
+subnet = "192.168.9.0/24"
+note = "5GHz KinderLab. Same filtered DNS policy as 2.4GHz."
 
 # Confirmed port mapping for GL-MT6000 (GL.iNet firmware 4.8.4)
 # Physical labels do NOT always match UCI names in WAN/LAN combo mode.
